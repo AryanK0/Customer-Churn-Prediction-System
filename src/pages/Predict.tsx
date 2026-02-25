@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TrendingDown, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { apiPredict, type ModelType } from '../lib/api';
 
 interface PredictionInput {
   gender: string;
@@ -32,53 +33,45 @@ export default function Predict() {
 
   const [result, setResult] = useState<PredictionResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [model, setModel] = useState<ModelType>('final');
 
   const handlePredict = async () => {
     setLoading(true);
-
-    let probability = 0.3;
-
-    if (input.contractType === 'Month-to-month') probability += 0.25;
-    if (input.monthlyCharges > 70) probability += 0.15;
-    if (input.techSupport === 'No') probability += 0.15;
-    if (input.tenure < 12) probability += 0.15;
-    if (input.paymentMethod === 'Electronic check') probability += 0.10;
-
-    probability = Math.min(probability, 0.95);
-
-    const riskLevel = probability > 0.7 ? 'High' : probability > 0.4 ? 'Medium' : 'Low';
-
-    const riskDrivers = [];
-    if (input.contractType === 'Month-to-month') riskDrivers.push('Month-to-month contract');
-    if (input.monthlyCharges > 70) riskDrivers.push('High monthly charges');
-    if (input.techSupport === 'No') riskDrivers.push('No tech support');
-    if (input.tenure < 12) riskDrivers.push('Short tenure');
-
-    const suggestions = [];
-    if (input.contractType === 'Month-to-month') suggestions.push('Offer loyalty discount');
-    if (input.contractType === 'Month-to-month') suggestions.push('Upgrade to annual plan');
-    if (input.techSupport === 'No') suggestions.push('Provide priority support');
-    if (input.monthlyCharges > 70) suggestions.push('Introduce value-added services');
-
-    await supabase.from('predictions').insert({
-      gender: input.gender,
-      contract_type: input.contractType,
-      internet_service: input.internetService,
-      tech_support: input.techSupport,
-      payment_method: input.paymentMethod,
-      tenure: input.tenure,
-      monthly_charges: input.monthlyCharges,
-      churn_probability: probability,
-      risk_level: riskLevel,
-    });
-
-    setResult({
-      probability: Math.round(probability * 100),
-      riskLevel,
-      riskDrivers,
-      suggestions,
-    });
-
+    try {
+      const data = await apiPredict(input, model);
+      await supabase.from('predictions').insert({
+        gender: input.gender,
+        contract_type: input.contractType,
+        internet_service: input.internetService,
+        tech_support: input.techSupport,
+        payment_method: input.paymentMethod,
+        tenure: input.tenure,
+        monthly_charges: input.monthlyCharges,
+        churn_probability: data.probability / 100,
+        risk_level: data.riskLevel,
+      });
+      setResult(data);
+    } catch {
+      // Fallback to client-side logic if API unreachable (e.g. local dev without backend)
+      let probability = 0.3;
+      if (input.contractType === 'Month-to-month') probability += 0.25;
+      if (input.monthlyCharges > 70) probability += 0.15;
+      if (input.techSupport === 'No') probability += 0.15;
+      if (input.tenure < 12) probability += 0.15;
+      if (input.paymentMethod === 'Electronic check') probability += 0.10;
+      probability = Math.min(probability, 0.95);
+      const riskLevel = probability > 0.7 ? 'High' : probability > 0.4 ? 'Medium' : 'Low';
+      const riskDrivers: string[] = [];
+      if (input.contractType === 'Month-to-month') riskDrivers.push('Month-to-month contract');
+      if (input.monthlyCharges > 70) riskDrivers.push('High monthly charges');
+      if (input.techSupport === 'No') riskDrivers.push('No tech support');
+      if (input.tenure < 12) riskDrivers.push('Short tenure');
+      const suggestions: string[] = [];
+      if (input.contractType === 'Month-to-month') suggestions.push('Offer loyalty discount', 'Upgrade to annual plan');
+      if (input.techSupport === 'No') suggestions.push('Provide priority support');
+      if (input.monthlyCharges > 70) suggestions.push('Introduce value-added services');
+      setResult({ probability: Math.round(probability * 100), riskLevel, riskDrivers, suggestions });
+    }
     setLoading(false);
   };
 
@@ -117,6 +110,18 @@ export default function Predict() {
             <h2 className="text-xl font-bold mb-6">Customer Information</h2>
 
             <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-[#B3B3B3] mb-2">Model (Notebook)</label>
+                <select
+                  value={model}
+                  onChange={(e) => setModel(e.target.value as ModelType)}
+                  className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50"
+                >
+                  <option value="final">Final (PyCaret LR)</option>
+                  <option value="benchmark">Benchmark (H2O)</option>
+                  <option value="test">Test (XGBoost/LGB/CatBoost)</option>
+                </select>
+              </div>
               <div>
                 <label className="block text-sm text-[#B3B3B3] mb-2">Gender</label>
                 <select

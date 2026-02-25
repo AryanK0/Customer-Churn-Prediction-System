@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Upload as UploadIcon, FileText, CheckCircle, Download } from 'lucide-react';
+import { apiUpload, type ModelType } from '../lib/api';
 
 interface UploadResult {
   filename: string;
@@ -13,6 +14,7 @@ export default function Upload() {
   const [dragActive, setDragActive] = useState(false);
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [model, setModel] = useState<ModelType>('final');
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -46,24 +48,25 @@ export default function Upload() {
       alert('Please upload a CSV file');
       return;
     }
-
     setUploading(true);
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    const total = Math.floor(Math.random() * 500) + 100;
-    const high = Math.floor(total * 0.25);
-    const medium = Math.floor(total * 0.4);
-    const low = total - high - medium;
-
-    setUploadResult({
-      filename: file.name,
-      totalRecords: total,
-      highRiskCount: high,
-      mediumRiskCount: medium,
-      lowRiskCount: low,
-    });
-
+    try {
+      const data = await apiUpload(file, model);
+      setUploadResult({
+        filename: data.filename ?? file.name,
+        totalRecords: data.totalRecords ?? 0,
+        highRiskCount: data.highRiskCount ?? 0,
+        mediumRiskCount: data.mediumRiskCount ?? 0,
+        lowRiskCount: data.lowRiskCount ?? 0,
+      });
+    } catch {
+      setUploadResult({
+        filename: file.name,
+        totalRecords: 0,
+        highRiskCount: 0,
+        mediumRiskCount: 0,
+        lowRiskCount: 0,
+      });
+    }
     setUploading(false);
   };
 
@@ -77,6 +80,16 @@ export default function Upload() {
 
         <div className="bg-[#1f1f1f] rounded-lg p-8 border border-[#2a2a2a]">
           <div className="mb-6">
+            <h2 className="text-xl font-bold mb-2">Model (Notebook)</h2>
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value as ModelType)}
+              className="w-full max-w-xs bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50 mb-4"
+            >
+              <option value="final">Final (PyCaret LR)</option>
+              <option value="benchmark">Benchmark (H2O)</option>
+              <option value="test">Test (XGBoost/LGB/CatBoost)</option>
+            </select>
             <h2 className="text-xl font-bold mb-2">CSV Format Requirements</h2>
             <p className="text-sm text-[#B3B3B3] mb-4">Your CSV should contain the following columns:</p>
             <div className="bg-[#141414] rounded-lg p-4 text-sm font-mono text-[#B3B3B3]">

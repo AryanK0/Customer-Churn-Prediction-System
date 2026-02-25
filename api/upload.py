@@ -14,15 +14,26 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 
 def _row_to_data(row: dict) -> dict:
-    """Map CSV columns to prediction input format."""
+    """Map CSV columns (Dataset.csv, excluding customerID) to prediction input format."""
     return {
         "gender": row.get("gender", "Male"),
-        "contractType": row.get("contract_type", row.get("contractType", "Month-to-month")),
-        "internetService": row.get("internet_service", row.get("internetService", "DSL")),
-        "techSupport": row.get("tech_support", row.get("techSupport", "No")),
-        "paymentMethod": row.get("payment_method", row.get("paymentMethod", "Electronic check")),
+        "seniorCitizen": int(float(row.get("SeniorCitizen", 0) or 0)),
+        "partner": row.get("Partner", "No"),
+        "dependents": row.get("Dependents", "No"),
         "tenure": int(float(row.get("tenure", 0) or 0)),
-        "monthlyCharges": float(row.get("monthly_charges", row.get("monthlyCharges", 0)) or 0),
+        "phoneService": row.get("PhoneService", "Yes"),
+        "multipleLines": row.get("MultipleLines", "No"),
+        "internetService": row.get("InternetService", "DSL"),
+        "onlineSecurity": row.get("OnlineSecurity", "No"),
+        "deviceProtection": row.get("DeviceProtection", "No"),
+        "techSupport": row.get("TechSupport", "No"),
+        "streamingTV": row.get("StreamingTV", "No"),
+        "streamingMovies": row.get("StreamingMovies", "No"),
+        "contractType": row.get("Contract", row.get("contract_type", "Month-to-month")),
+        "paperlessBilling": row.get("PaperlessBilling", "Yes"),
+        "paymentMethod": row.get("PaymentMethod", row.get("payment_method", "Electronic check")),
+        "monthlyCharges": float(row.get("MonthlyCharges", row.get("monthly_charges", 0)) or 0),
+        "totalCharges": float(row.get("TotalCharges", row.get("total_charges", 0)) or 0),
     }
 
 

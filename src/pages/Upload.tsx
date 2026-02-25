@@ -92,8 +92,10 @@ export default function Upload() {
             </select>
             <h2 className="text-xl font-bold mb-2">CSV Format Requirements</h2>
             <p className="text-sm text-[#B3B3B3] mb-4">Your CSV should contain the following columns:</p>
-            <div className="bg-[#141414] rounded-lg p-4 text-sm font-mono text-[#B3B3B3]">
-              gender, contract_type, internet_service, tech_support, payment_method, tenure, monthly_charges
+            <div className="bg-[#141414] rounded-lg p-4 text-sm font-mono text-[#B3B3B3] break-all">
+              gender, SeniorCitizen, Partner, Dependents, tenure, PhoneService, MultipleLines,
+              InternetService, OnlineSecurity, DeviceProtection, TechSupport, StreamingTV, StreamingMovies,
+              Contract, PaperlessBilling, PaymentMethod, MonthlyCharges, TotalCharges
             </div>
           </div>
 

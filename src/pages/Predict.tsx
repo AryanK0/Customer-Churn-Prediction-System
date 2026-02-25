@@ -5,12 +5,23 @@ import { apiPredict, type ModelType } from '../lib/api';
 
 interface PredictionInput {
   gender: string;
-  contractType: string;
-  internetService: string;
-  techSupport: string;
-  paymentMethod: string;
+  seniorCitizen: number;
+  partner: string;
+  dependents: string;
   tenure: number;
+  phoneService: string;
+  multipleLines: string;
+  internetService: string;
+  onlineSecurity: string;
+  deviceProtection: string;
+  techSupport: string;
+  streamingTV: string;
+  streamingMovies: string;
+  contractType: string;
+  paperlessBilling: string;
+  paymentMethod: string;
   monthlyCharges: number;
+  totalCharges: number;
 }
 
 interface PredictionResult {
@@ -23,12 +34,23 @@ interface PredictionResult {
 export default function Predict() {
   const [input, setInput] = useState<PredictionInput>({
     gender: 'Male',
-    contractType: 'Month-to-month',
-    internetService: 'Fiber optic',
-    techSupport: 'No',
-    paymentMethod: 'Electronic check',
+    seniorCitizen: 0,
+    partner: 'No',
+    dependents: 'No',
     tenure: 12,
+    phoneService: 'Yes',
+    multipleLines: 'No',
+    internetService: 'Fiber optic',
+    onlineSecurity: 'No',
+    deviceProtection: 'No',
+    techSupport: 'No',
+    streamingTV: 'No',
+    streamingMovies: 'No',
+    contractType: 'Month-to-month',
+    paperlessBilling: 'Yes',
+    paymentMethod: 'Electronic check',
     monthlyCharges: 70,
+    totalCharges: 100,
   });
 
   const [result, setResult] = useState<PredictionResult | null>(null);
@@ -41,24 +63,36 @@ export default function Predict() {
       const data = await apiPredict(input, model);
       await supabase.from('predictions').insert({
         gender: input.gender,
-        contract_type: input.contractType,
-        internet_service: input.internetService,
-        tech_support: input.techSupport,
-        payment_method: input.paymentMethod,
+        senior_citizen: input.seniorCitizen,
+        partner: input.partner,
+        dependents: input.dependents,
         tenure: input.tenure,
+        phone_service: input.phoneService,
+        multiple_lines: input.multipleLines,
+        internet_service: input.internetService,
+        online_security: input.onlineSecurity,
+        device_protection: input.deviceProtection,
+        tech_support: input.techSupport,
+        streaming_tv: input.streamingTV,
+        streaming_movies: input.streamingMovies,
+        contract_type: input.contractType,
+        paperless_billing: input.paperlessBilling,
+        payment_method: input.paymentMethod,
         monthly_charges: input.monthlyCharges,
+        total_charges: input.totalCharges,
         churn_probability: data.probability / 100,
         risk_level: data.riskLevel,
       });
       setResult(data);
     } catch {
-      // Fallback to client-side logic if API unreachable (e.g. local dev without backend)
-      let probability = 0.3;
-      if (input.contractType === 'Month-to-month') probability += 0.25;
-      if (input.monthlyCharges > 70) probability += 0.15;
-      if (input.techSupport === 'No') probability += 0.15;
-      if (input.tenure < 12) probability += 0.15;
-      if (input.paymentMethod === 'Electronic check') probability += 0.10;
+      // Fallback if API unreachable (e.g. local dev without backend)
+      let probability = 0.25;
+      if (input.contractType === 'Month-to-month') probability += 0.22;
+      if (input.monthlyCharges > 70) probability += 0.12;
+      if (input.techSupport === 'No') probability += 0.12;
+      if (input.tenure < 12) probability += 0.12;
+      if (input.paymentMethod === 'Electronic check') probability += 0.08;
+      if (input.internetService === 'Fiber optic') probability += 0.06;
       probability = Math.min(probability, 0.95);
       const riskLevel = probability > 0.7 ? 'High' : probability > 0.4 ? 'Medium' : 'Low';
       const riskDrivers: string[] = [];
@@ -109,7 +143,7 @@ export default function Predict() {
           <div className="bg-[#1f1f1f] rounded-lg p-6 border border-[#2a2a2a]">
             <h2 className="text-xl font-bold mb-6">Customer Information</h2>
 
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
               <div>
                 <label className="block text-sm text-[#B3B3B3] mb-2">Model (Notebook)</label>
                 <select
@@ -122,91 +156,148 @@ export default function Predict() {
                   <option value="test">Test (XGBoost/LGB/CatBoost)</option>
                 </select>
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Gender</label>
+                  <select value={input.gender} onChange={(e) => setInput({ ...input, gender: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>Male</option>
+                    <option>Female</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Senior Citizen</label>
+                  <select value={input.seniorCitizen} onChange={(e) => setInput({ ...input, seniorCitizen: Number(e.target.value) })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option value={0}>No</option>
+                    <option value={1}>Yes</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Partner</label>
+                  <select value={input.partner} onChange={(e) => setInput({ ...input, partner: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Dependents</label>
+                  <select value={input.dependents} onChange={(e) => setInput({ ...input, dependents: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Tenure (months)</label>
+                  <input type="number" value={input.tenure} onChange={(e) => setInput({ ...input, tenure: parseInt(e.target.value) || 0 })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50" min={0} />
+                </div>
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Phone Service</label>
+                  <select value={input.phoneService} onChange={(e) => setInput({ ...input, phoneService: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+                </div>
+              </div>
               <div>
-                <label className="block text-sm text-[#B3B3B3] mb-2">Gender</label>
-                <select
-                  value={input.gender}
-                  onChange={(e) => setInput({ ...input, gender: e.target.value })}
-                  className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50"
-                >
-                  <option>Male</option>
-                  <option>Female</option>
+                <label className="block text-sm text-[#B3B3B3] mb-2">Multiple Lines</label>
+                <select value={input.multipleLines} onChange={(e) => setInput({ ...input, multipleLines: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                  <option>No</option>
+                  <option>Yes</option>
+                  <option>No phone service</option>
                 </select>
               </div>
-
-              <div>
-                <label className="block text-sm text-[#B3B3B3] mb-2">Contract Type</label>
-                <select
-                  value={input.contractType}
-                  onChange={(e) => setInput({ ...input, contractType: e.target.value })}
-                  className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50"
-                >
-                  <option>Month-to-month</option>
-                  <option>One year</option>
-                  <option>Two year</option>
-                </select>
-              </div>
-
               <div>
                 <label className="block text-sm text-[#B3B3B3] mb-2">Internet Service</label>
-                <select
-                  value={input.internetService}
-                  onChange={(e) => setInput({ ...input, internetService: e.target.value })}
-                  className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50"
-                >
+                <select value={input.internetService} onChange={(e) => setInput({ ...input, internetService: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
                   <option>DSL</option>
                   <option>Fiber optic</option>
                   <option>No</option>
                 </select>
               </div>
-
-              <div>
-                <label className="block text-sm text-[#B3B3B3] mb-2">Tech Support</label>
-                <select
-                  value={input.techSupport}
-                  onChange={(e) => setInput({ ...input, techSupport: e.target.value })}
-                  className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50"
-                >
-                  <option>Yes</option>
-                  <option>No</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Online Security</label>
+                  <select value={input.onlineSecurity} onChange={(e) => setInput({ ...input, onlineSecurity: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>No</option>
+                    <option>Yes</option>
+                    <option>No internet service</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Device Protection</label>
+                  <select value={input.deviceProtection} onChange={(e) => setInput({ ...input, deviceProtection: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>No</option>
+                    <option>Yes</option>
+                    <option>No internet service</option>
+                  </select>
+                </div>
               </div>
-
-              <div>
-                <label className="block text-sm text-[#B3B3B3] mb-2">Payment Method</label>
-                <select
-                  value={input.paymentMethod}
-                  onChange={(e) => setInput({ ...input, paymentMethod: e.target.value })}
-                  className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50"
-                >
-                  <option>Electronic check</option>
-                  <option>Mailed check</option>
-                  <option>Bank transfer</option>
-                  <option>Credit card</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Tech Support</label>
+                  <select value={input.techSupport} onChange={(e) => setInput({ ...input, techSupport: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>No</option>
+                    <option>Yes</option>
+                    <option>No internet service</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Streaming TV</label>
+                  <select value={input.streamingTV} onChange={(e) => setInput({ ...input, streamingTV: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>No</option>
+                    <option>Yes</option>
+                    <option>No internet service</option>
+                  </select>
+                </div>
               </div>
-
-              <div>
-                <label className="block text-sm text-[#B3B3B3] mb-2">Tenure (months)</label>
-                <input
-                  type="number"
-                  value={input.tenure}
-                  onChange={(e) => setInput({ ...input, tenure: parseInt(e.target.value) })}
-                  className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50"
-                  min="0"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Streaming Movies</label>
+                  <select value={input.streamingMovies} onChange={(e) => setInput({ ...input, streamingMovies: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>No</option>
+                    <option>Yes</option>
+                    <option>No internet service</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Contract</label>
+                  <select value={input.contractType} onChange={(e) => setInput({ ...input, contractType: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>Month-to-month</option>
+                    <option>One year</option>
+                    <option>Two year</option>
+                  </select>
+                </div>
               </div>
-
-              <div>
-                <label className="block text-sm text-[#B3B3B3] mb-2">Monthly Charges ($)</label>
-                <input
-                  type="number"
-                  value={input.monthlyCharges}
-                  onChange={(e) => setInput({ ...input, monthlyCharges: parseFloat(e.target.value) })}
-                  className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50"
-                  min="0"
-                  step="0.01"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Paperless Billing</label>
+                  <select value={input.paperlessBilling} onChange={(e) => setInput({ ...input, paperlessBilling: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Payment Method</label>
+                  <select value={input.paymentMethod} onChange={(e) => setInput({ ...input, paymentMethod: e.target.value })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50">
+                    <option>Electronic check</option>
+                    <option>Mailed check</option>
+                    <option>Bank transfer (automatic)</option>
+                    <option>Credit card (automatic)</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Monthly Charges ($)</label>
+                  <input type="number" value={input.monthlyCharges} onChange={(e) => setInput({ ...input, monthlyCharges: parseFloat(e.target.value) || 0 })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50" min={0} step="0.01" />
+                </div>
+                <div>
+                  <label className="block text-sm text-[#B3B3B3] mb-2">Total Charges ($)</label>
+                  <input type="number" value={input.totalCharges} onChange={(e) => setInput({ ...input, totalCharges: parseFloat(e.target.value) || 0 })} className="w-full bg-[#141414] border border-[#2a2a2a] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#E50914]/50" min={0} step="0.01" />
+                </div>
               </div>
 
               <button

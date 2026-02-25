@@ -9,12 +9,23 @@ export type ModelType = "final" | "benchmark" | "test";
 
 interface PredictInput {
   gender: string;
-  contractType: string;
-  internetService: string;
-  techSupport: string;
-  paymentMethod: string;
+  seniorCitizen?: number;
+  partner?: string;
+  dependents?: string;
   tenure: number;
+  phoneService?: string;
+  multipleLines?: string;
+  internetService: string;
+  onlineSecurity?: string;
+  deviceProtection?: string;
+  techSupport: string;
+  streamingTV?: string;
+  streamingMovies?: string;
+  contractType: string;
+  paperlessBilling?: string;
+  paymentMethod: string;
   monthlyCharges: number;
+  totalCharges?: number;
 }
 
 export async function apiPredict(data: PredictInput, model: ModelType = "final") {

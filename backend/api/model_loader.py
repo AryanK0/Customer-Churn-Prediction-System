@@ -43,11 +43,14 @@ def load_all_models():
         raise FileNotFoundError(f"Best model not found at: {best_model_path}")
     MODEL_REGISTRY["best_model"] = joblib.load(best_model_path)
     
-    shap_path = SHAP_DIR / "shap_explainer.joblib"
-    if not shap_path.exists():
-        raise FileNotFoundError(f"SHAP explainer not found at: {shap_path}")
-    shap_data = joblib.load(shap_path)
-    SHAP_EXPLAINER = shap_data.get("explainer", shap_data)
+    import shap
+    best_model = MODEL_REGISTRY["best_model"]
+    try:
+        SHAP_EXPLAINER = shap.TreeExplainer(best_model)
+        log.info("SHAP explainer created dynamically.")
+    except Exception as e:
+        log.warning(f"Failed to create SHAP explainer: {e}")
+        SHAP_EXPLAINER = None
     
     if TOURNAMENT_RESULTS.exists():
         with open(TOURNAMENT_RESULTS, "r") as f:

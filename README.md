@@ -99,8 +99,8 @@ CCP/
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/AryanK0/ccp.git
-cd ccp
+git clone https://github.com/AryanK0/Customer-Churn-Prediction-System.git
+cd Customer-Churn-Prediction-System
 ```
 
 2. **Environment Setup**

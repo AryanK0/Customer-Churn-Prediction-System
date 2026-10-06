@@ -1,0 +1,35 @@
+{
+  "final_records": 29817,
+  "churn_rate_pct": 1.98,
+  "source_distribution": {
+    "cell2cell": 20000,
+    "synthetic_telecom": 6000,
+    "iranian": 3150,
+    "orange": 667
+  },
+  "missing_final": {
+    "customer_id": 0,
+    "source_dataset": 0,
+    "gender": 0,
+    "senior_citizen": 0,
+    "partner": 0,
+    "dependents": 0,
+    "tenure_months": 0,
+    "phone_service": 0,
+    "multiple_lines": 0,
+    "internet_service": 0,
+    "online_security": 0,
+    "device_protection": 0,
+    "tech_support": 0,
+    "streaming_tv": 0,
+    "streaming_movies": 0,
+    "contract_type": 0,
+    "paperless_billing": 0,
+    "payment_method": 0,
+    "monthly_charges": 0,
+    "total_charges": 0,
+    "call_frequency_or_usage": 0,
+    "complaints_logged": 0,
+    "churn": 0
+  }
+}

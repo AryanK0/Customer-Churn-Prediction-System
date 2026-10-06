@@ -56,11 +56,13 @@ A full-stack, enterprise-grade machine learning platform for predicting customer
 
 ```
 CCP/
-├── api/                          # FastAPI serverless functions & ML inference
-│   ├── main.py                   # Main application entry point
-│   ├── models.py                 # Shared ML logic
-│   ├── predict.py                # Unified prediction endpoint
-│   └── upload.py                 # Bulk CSV processing
+├── backend/                      # FastAPI backend & HuggingFace deployment
+│   ├── api/
+│   │   ├── main.py               # Main application entry point
+│   │   ├── models.py             # Shared ML logic
+│   │   ├── predict.py            # Unified prediction endpoint
+│   │   └── upload.py             # Bulk CSV processing
+│   └── requirements.txt
 ├── frontend/                     # React frontend (Vite)
 │   ├── public/
 │   │   └── sample_template.csv   # Demo CSV for bulk upload

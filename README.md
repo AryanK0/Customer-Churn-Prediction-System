@@ -1,3 +1,12 @@
+---
+title: CCP Backend
+emoji: 🚀
+colorFrom: blue
+colorTo: red
+sdk: gradio
+app_file: app.py
+pinned: false
+---
 # 🎬 CCP - Customer Churn Prediction Platform
 
 <div align="center">

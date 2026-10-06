@@ -16,5 +16,4 @@ demo = gr.Interface(
 # Mount the dummy Gradio app on a subpath, leaving the root and /api for FastAPI
 app = gr.mount_gradio_app(app, demo, path="/status")
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+# HF Spaces will automatically find the 'app' object and serve it using its own ASGI runner on port 7860.

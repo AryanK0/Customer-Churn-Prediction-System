@@ -52,6 +52,7 @@ export default function History() {
   const PER_PAGE = 10;
 
   useEffect(() => { load(); }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { applyFilter(); }, [predictions, search, riskFilter]);
 
   const load = async () => {

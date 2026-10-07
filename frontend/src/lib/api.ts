@@ -30,6 +30,7 @@ interface PredictInput {
 }
 
 // Singleton client to avoid reconnecting
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _gradioClient: any = null;
 async function getClient() {
   if (!_gradioClient) {
@@ -59,6 +60,7 @@ export async function apiTest(data: PredictInput) {
   return apiPredict(data, "test");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function apiUpload(file: File, _model: ModelType = "final") {
   const app = await getClient();
   // Gradio client automatically handles uploading the File object

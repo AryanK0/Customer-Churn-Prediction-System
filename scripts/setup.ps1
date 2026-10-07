@@ -59,7 +59,6 @@ Write-Host "✅ Setup complete!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "1. Edit .env and add your Supabase credentials"
-Write-Host "2. Run 'npm run dev' to start the frontend"
-Write-Host "3. Run 'vercel dev' for full-stack development"
-Write-Host ""
+Write-Host "2. Terminal 1: Run 'python app.py' to start the backend"
+Write-Host "3. Terminal 2: Run 'cd frontend; npm run dev' to start the frontend"
 Write-Host "For deployment instructions, see DEPLOYMENT.md"

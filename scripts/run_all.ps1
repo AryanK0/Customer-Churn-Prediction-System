@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # RUN ALL PHASES - Customer Churn Prediction AI
 # ==============================================================================
 # Prerequisites:
@@ -18,5 +18,5 @@ python ml/src/ml/automl_benchmark.py
 
 Write-Host "=== PHASE 4: START API SERVER ==="
 $env:PYTHONPATH = ".;.\backend"
-cd backend
-uvicorn api.main:app --reload --port 8000
+cd .. # go to root directory where app.py is
+python app.py

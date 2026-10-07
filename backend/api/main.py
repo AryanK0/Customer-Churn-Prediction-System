@@ -36,6 +36,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def read_root():
+    return {"status": "ok", "message": "CCP Backend is running on Hugging Face Spaces"}
+
 @app.on_event("startup")
 async def startup_event():
     load_all_models()

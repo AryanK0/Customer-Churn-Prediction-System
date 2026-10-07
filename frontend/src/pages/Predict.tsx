@@ -172,6 +172,20 @@ export default function Predict() {
       if (input.techSupport === 'No') suggestions.push('Provide 3-month free tech support trial');
       if (input.monthlyCharges > 70) suggestions.push('Bundle value-added services to reduce cost perception');
       if (input.tenure < 12) suggestions.push('Assign dedicated onboarding success manager');
+      
+      const fallbackPrediction = {
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+        contract_type: input.contractType,
+        tenure: input.tenure,
+        monthly_charges: input.monthlyCharges,
+        churn_probability: probability,
+        risk_level: riskLevel
+      };
+      
+      const stored = JSON.parse(localStorage.getItem('predictions') || '[]');
+      localStorage.setItem('predictions', JSON.stringify([fallbackPrediction, ...stored].slice(0, 50)));
+
       setResult({ probability: Math.round(probability * 100), riskLevel, riskDrivers, suggestions });
     }
     setAnimKey(k => k + 1);

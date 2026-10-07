@@ -60,11 +60,11 @@ export default function History() {
     try {
       const { data } = await supabase.from('predictions').select('*').order('created_at', { ascending: false });
       const local = JSON.parse(localStorage.getItem('predictions') || '[]');
-      const combined = data && data.length > 0 ? data : local;
-      setPredictions(combined.length > 0 ? combined : MOCK);
+      const combined = data && data.length > 0 ? [...data, ...local] : [...local, ...MOCK];
+      setPredictions(combined);
     } catch {
       const local = JSON.parse(localStorage.getItem('predictions') || '[]');
-      setPredictions(local.length > 0 ? local : MOCK);
+      setPredictions([...local, ...MOCK]);
     }
     setLoading(false);
   };

@@ -3,7 +3,7 @@ title: CCP Backend
 emoji: 🚀
 colorFrom: blue
 colorTo: red
-sdk: gradio
+sdk: docker
 app_file: app.py
 pinned: false
 ---

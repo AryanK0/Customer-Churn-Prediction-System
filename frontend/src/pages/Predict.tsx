@@ -126,7 +126,9 @@ export default function Predict() {
     setLoading(true);
     try {
       const data = await apiPredict(input, model);
-      await supabase.from('predictions').insert({
+      const newPrediction = {
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
         gender: input.gender, senior_citizen: input.seniorCitizen, partner: input.partner,
         dependents: input.dependents, tenure: input.tenure, phone_service: input.phoneService,
         multiple_lines: input.multipleLines, internet_service: input.internetService,
@@ -136,7 +138,18 @@ export default function Predict() {
         paperless_billing: input.paperlessBilling, payment_method: input.paymentMethod,
         monthly_charges: input.monthlyCharges, total_charges: input.totalCharges,
         churn_probability: data.probability / 100, risk_level: data.riskLevel,
-      });
+      };
+
+      try {
+        await supabase.from('predictions').insert(newPrediction);
+      } catch {
+        // Ignore supabase error if not configured
+      }
+
+      // Save to local storage for instant UI updates when DB is not connected
+      const stored = JSON.parse(localStorage.getItem('predictions') || '[]');
+      localStorage.setItem('predictions', JSON.stringify([newPrediction, ...stored].slice(0, 50)));
+      
       setResult(data);
     } catch {
       let probability = 0.25;
